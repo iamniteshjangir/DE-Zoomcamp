@@ -1,0 +1,59 @@
+Question 1. Which tag has the following text? - Write the image ID to the file
+
+Answer: --iidfile string
+
+
+Question 2. Run docker with the python:3.9 image in an interactive mode and the entrypoint of bash. Now check the python modules that are installed ( use pip list). How many python packages/modules are installed?
+
+Answer: 3
+
+Question 3. How many taxi trips were totally made on January 15?
+
+Answer: 20530
+
+    SQL query: 
+    "select count(*)
+    from green_texi_trips gt
+    where CAST(gt."lpep_pickup_datetime" as date) = '2019-01-15'
+    AND CAST(gt."lpep_dropoff_datetime" as date) = '2019-01-15';"
+
+Question 4. Which was the day with the largest trip distance Use the pick up time for your calculations.
+
+Answer: 2019-01-15
+
+    SQL query: 
+    "select CAST(gt."lpep_pickup_datetime" as date) as pickup_date, gt.trip_distance
+    from green_texi_trips gt
+    where gt."trip_distance" = (select max(gtt."trip_distance") from green_texi_trips gtt);"
+
+Question 5. In 2019-01-01 how many trips had 2 and 3 passengers?
+
+Answer: 2: 1282 ; 3: 254
+
+    SQL Query: 
+        "select 
+	        count(*),
+	        gt.passenger_count
+        from 
+	        green_texi_trips gt
+        where 
+	        cast(gt."lpep_pickup_datetime" as date) = '2019-01-01'
+	        and gt.passenger_count in (2, 3)
+        group by 
+	        gt.passenger_count;"
+
+Question 6. For the passengers picked up in the Astoria Zone which was the drop off zone that had the largest tip? We want the name of the zone, not the id.
+
+Answer: Long Island City/Queens Plaza
+
+    SQL Query:
+
+        "select gt."tip_amount", zd."Zone"
+        from green_texi_trips gt
+        inner join zones zp
+        on gt."PULocationID" = zp."LocationID"
+        inner join zones zd
+        on gt."DOLocationID" = zd."LocationID"
+        where zp."Zone" = 'Astoria'
+        order by tip_amount desc
+        limit 1;"
